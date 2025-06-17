@@ -1,5 +1,6 @@
 import { model, Schema } from "mongoose";
 import { IAddress, IUser } from "../interfaces/user.interface";
+import bcrypt from "bcryptjs"
 
 const addressSchema = new Schema<IAddress>({
     city: { type: String },
@@ -14,8 +15,8 @@ const userSchema = new Schema<IUser>({
     firstName: {
       type: String,
       required: true,
-      minlength: 5,
-      maxlength: 10,
+      minlength: 3,
+      maxlength: 20,
     },
     lastName: {
       type: String,
@@ -51,5 +52,9 @@ const userSchema = new Schema<IUser>({
     timestamps: true,
   }
 );
+
+userSchema.pre("save", async function() {
+  this.password = await bcrypt.hash(this.password, 10);  
+})
 
 export const User = model<IUser>("User", userSchema);
